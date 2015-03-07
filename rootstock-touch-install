@@ -2,7 +2,7 @@
 #
 #  Copyright (c) 2014 Canonical
 #
-#  Author: Oliver Grawert <ogra@canonical.com>
+#  Author: Oliver Grawert <ogra@canonical.com>, Louis Popi <theh2o64@gmail.com>
 #
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU General Public License as
@@ -38,6 +38,14 @@ do_shell()
 	adb shell "$@"
 }
 
+install_FALCON()
+{
+	adb push configs/70-falcon.rules /cache/system/usr/lib/lxc-android-config
+	adb push configs/adbd /data/debug/adbd
+	do_shell "rm /cache/system/etc/init/ubuntu-location-service.conf"
+}
+
+
 convert_android_img()
 {
 	simg2img $SYSIMG $WORKDIR/system.img.raw
@@ -62,24 +70,6 @@ prepare_ubuntu_system()
 	do_shell "mkdir -p /cache/system"
 	do_shell "mount -o loop /data/system.img /cache/system/"
 }
-
-cleanup()
-{
-	mount | grep -q $TMPMOUNT 2>/dev/null && umount $TMPMOUNT
-	cleanup_device
-	rm -rf $WORKDIR
-	echo
-}
-
-cleanup_device()
-{
-	[ -e $WORKDIR/device-clean ] && return
-	do_shell "umount /cache/system/ 2>/dev/null && rm -rf /cache/system 2>/dev/null"
-	do_shell "rm -f /recovery/$TARBALL"
-	[ -e $WORKDIR ] && touch $WORKDIR/device-clean 2>/dev/null || true
-}
-
-trap cleanup 0 1 2 3 9 15
 
 usage()
 {
@@ -145,10 +135,6 @@ fi
 
 check_prereq
 
-if ! adb devices | grep -q recovery; then
-	echo "please make sure the device is attched via USB in recovery mode"
-	exit 1
-fi
 
 WORKDIR=$(mktemp -d /tmp/rootstock-touch-install.XXXXX)
 TMPMOUNT="$WORKDIR/tmpmount"
@@ -203,8 +189,8 @@ echo -n "enabling Mir ... "
 do_shell "touch /cache/system/home/phablet/.display-mir"
 echo "[done]"
 
-echo -n "cleaning up on device ... "
-cleanup_device
+echo -n "Setting Moto G configs... "
+install_FALCON
 echo "[done]"
 
 echo "rebooting device"
