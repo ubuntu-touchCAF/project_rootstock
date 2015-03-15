@@ -40,8 +40,9 @@ do_shell()
 
 install_FALCON()
 {
-	adb push configs/70-falcon.rules /cache/system/usr/lib/lxc-android-config
-	adb push configs/adbd /data/debug/adbd
+#	adb push configs/70-falcon.rules /cache/system/usr/lib/lxc-android-config
+	adb push configs/adbd /usr/bin/adbd
+	do_shell "echo "start on startup" >/etc/init/android-tools-adbd.override"
 	do_shell "rm /cache/system/etc/init/ubuntu-location-service.conf"
 }
 
