@@ -38,11 +38,10 @@ do_shell()
 	adb shell "$@"
 }
 
-install_FALCON()
+install_falcon()
 {
-#	adb push configs/70-falcon.rules /cache/system/usr/lib/lxc-android-config
-	adb push configs/adbd /usr/bin/adbd
-	do_shell "echo "start on startup" >/etc/init/android-tools-adbd.override"
+	adb push configs/70-falcon.rules /cache/system/usr/lib/lxc-android-config
+	adb push configs/adbd.conf /cache/system/etc/init/
 	do_shell "rm /cache/system/etc/init/ubuntu-location-service.conf"
 }
 
@@ -191,7 +190,7 @@ do_shell "touch /cache/system/home/phablet/.display-mir"
 echo "[done]"
 
 echo -n "Setting Moto G configs... "
-install_FALCON
+install_falcon
 echo "[done]"
 
 echo "rebooting device"
