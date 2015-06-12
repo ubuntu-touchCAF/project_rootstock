@@ -43,6 +43,7 @@ install_falcon()
 	adb push configs/70-falcon.rules /cache/system/usr/lib/lxc-android-config
 	adb push configs/adbd.conf /cache/system/etc/init/
 	do_shell "rm /cache/system/etc/init/ubuntu-location-service.conf"
+	do_shell "rm /cache/system/etc/init/ureadahead-touch.conf"
 }
 
 
